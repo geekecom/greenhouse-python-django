@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		console.log("ready!");
+
+		getTemperatureIndoor();
+		getTemperatureOutdoor();
+		getHumidityIndoor();
+		getHumidityOutdoor();
+		getCO2();
+		getLightStartTime();
+		getLightStopTime();
+		
+		updatePinStateView();
+	});
+	
+	function updatePinStateView(){
+	//update the pin state view
+		{% for device in device_list %}
+			getPinState('{{device.name}}.pinState',{{device.pin}});
+		{% endfor %}
+	}
+	
+	function sleep (time) {
+		  return new Promise((resolve) => setTimeout(resolve, time));
+		}
+
+	function setDeviceState(name, state) {
+		$.ajax({
+			url : "setDeviceState/" + name + "/" + state + "/",
+			success : function(result) {
+				var device_state_field_id = "[id='" + name + ".state']";
+				$(device_state_field_id).html(result);
+				updatePinStateView();
+			}
+		});
+	}
+	
+	function getPinState(idField,pin){
+		var url = "getPinState/" + pin
+		$.get( url , function( data ) {
+			//'{{device.name}}.pinState'
+			var device_pin_field_id = "[id='" + idField+ "']";
+			$(device_pin_field_id).html( data );
+			});
+	}
+
+	function changeLightSchedule() {
+		var startTime = $("#lightStartTime").val();
+		var stopTime = $("#lightStopTime").val();
+		var url = "setLightSchedule/" + startTime + "/" + stopTime;
+		$.get(url, function(data) {
+			alert("Light schedule modified.");
+			getLightStartTime();
+			getLightStopTime();
+		});
+	}
+
+	function getTemperatureIndoor() {
+		var url = "getTemperatureIndoor";
+		$.get(url, function(data) {
+			$("#temperatureIndoor").html(data + " ");
+		});
+	}
+
+	function getTemperatureOutdoor() {
+		var url = "getTemperatureOutdoor";
+		$.get(url, function(data) {
+			$("#temperatureOutdoor").html(data);
+		});
+	}
+
+	function getHumidityIndoor() {
+		var url = "getHumidityIndoor";
+		$.get(url, function(data) {
+			$("#humidityIndoor").html(data);
+		});
+	}
+
+	function getHumidityOutdoor() {
+		var url = "getHumidityOutdoor";
+		$.get(url, function(data) {
+			$("#humidityOutdoor").html(data);
+		});
+	}
+
+	function getCO2() {
+		var url = "getCO2";
+		$.get(url, function(data) {
+			$("#CO2").html(data);
+		});
+	}
+
+	function getLightStartTime() {
+		var url = "getLightStartTime";
+		$.get(url, function(data) {
+			$("#lightCurrentStartTime").html(data);
+		});
+	}
+
+	function getLightStopTime() {
+		var url = "getLightStopTime";
+		$.get(url, function(data) {
+			$("#lightCurrentStopTime").html(data);
+		});
+	}
+</script>
+<body>
+	<h1>Automation System</h1>
+	<div id=climateParameters>
+		<table>
+			<tr>
+				<td>Temperature indoor</td>
+				<td id="temperatureIndoor"></td>
+			</tr>
+			<tr>
+				<td>Temperature outdoor</td>
+				<td id="temperatureOutdoor"></td>
+			</tr>
+			<tr>
+				<td>Humidity indoor</td>
+				<td id="humidityIndoor"></td>
+			</tr>
+			<tr>
+				<td>Humidity outdoor</td>
+				<td id="humidityOutdoor"></td>
+			</tr>
+			<tr>
+				<td>CO2</td>
+				<td id="CO2"></td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		{% if device_list %}
+		<table border=1>
+			<tr>
+				<td>Device</td>
+				<td>State</td>
+				<td></td>
+				<td></td>
+				<td></td>
+				<td>State</td>
+			</tr>
+			{% for device in device_list %}
+			<tr>
+				<td>{{device.name}}</td>
+				<td id='{{device.name}}.state'>{{device.state}}</td>
+				<td><button id={{device.name}}
+						onclick="setDeviceState('{{device.name}}','on')">ON</button></td>
+				<td><button id={{device.name}}
+						onclick="setDeviceState('{{device.name}}','off')">OFF</button></td>
+				<td><button id={{device.name}}
+						onclick="setDeviceState('{{device.name}}','auto')">Auto</button></td>
+				<td id='{{device.name}}.pinState'
+					onload="getPinState('{{device.name}}.pinState',{{device.pin}});"></td>
+			</tr>
+			{% endfor %}
+		</table>
+		{% else %}
+		<p>No Devices</p>
+		{% endif %}
+	</div>
+
+	<div>
+		<h2>Light schedule</h2>
+		<h3>Current schedule</h3>
+		<table>
+			<tr>
+				<td>Start time</td>
+				<td id="lightCurrentStartTime"></td>
+			</tr>
+			<tr>
+				<td>Stop time</td>
+				<td id="lightCurrentStopTime"></td>
+			</tr>
+		</table>
+		<h3>Change schedule</h3>
+		<table>
+			<tr>
+				<td>Start time</td>
+				<td><input type="time" id="lightStartTime"></td>
+			</tr>
+			<tr>
+				<td>Stop time</td>
+				<td><input type="time" id="lightStopTime"></td>
+			</tr>
+			<tr>
+				<td><input type="button" id="buttonChangeLight" value="Change"
+					onclick="changeLightSchedule()"></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

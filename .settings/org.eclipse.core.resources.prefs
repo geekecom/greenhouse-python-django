@@ -1,0 +1,9 @@
+eclipse.preferences.version=1
+encoding//interface/migrations/0001_initial.py=utf-8
+encoding//interface/migrations/0002_auto_20160710_1207.py=utf-8
+encoding//interface/migrations/0003_auto_20160710_1208.py=utf-8
+encoding//interface/migrations/0004_auto_20160710_1210.py=utf-8
+encoding//interface/migrations/0005_auto_20160710_1213.py=utf-8
+encoding//interface/migrations/0007_device_pin.py=utf-8
+encoding//interface/migrations/0009_auto_20160724_0909.py=utf-8
+encoding//interface/migrations/0010_auto_20160724_0913.py=utf-8
